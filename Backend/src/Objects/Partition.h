@@ -10,7 +10,7 @@ struct Partition{
     int         part_s;             //Size of the partition
     char        part_name[16];
     int         part_correlative;
-    char        part_id;
+    char        part_id[4];         //Id generated when mounting the partition
 };
 
 #pragma pack(pop)

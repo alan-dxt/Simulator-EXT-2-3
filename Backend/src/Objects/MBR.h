@@ -9,9 +9,9 @@ struct MBR{
     int         mbr_size;           //Disk size in bytes
     time_t      mbr_date;           //Date of creation
     int         mbr_dsk_signatire;  //Number that identifies the disk(random)
-    char        dsk_fit;            //Type of fit in the disk: Best(B), First(F) or Worst(W)
+    char        dsk_fit;            //Type of fit in the disk: Best(b), First(f) or Worst(w)
     Partition   partitions[4];
-}
+};
 
 #pragma pack(pop)
 

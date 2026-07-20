@@ -6,6 +6,7 @@
 #include "../Objects/Command.h"
 #include "../Objects/CommandResult.h"
 #include "../Controllers/Utilities.h"
+#include "./Routes/RoutesDisk.h"
 #include "./RoutesReader.h"
 
 
@@ -40,7 +41,7 @@ vector<Command> splitCommands(const string& str){
             string value = Utilities::Trim(token.substr(pos + 1));
             if(key.empty() || value.empty()) continue;      //not valid attribute
             cmd.params[key] = value;
-            cout<<"key: ["<<key<<"] value: ["<<value<<"]\n";
+            //cout<<"key: ["<<key<<"] value: ["<<value<<"]\n";
         }
         commands.push_back(cmd);
     }
@@ -48,8 +49,7 @@ vector<Command> splitCommands(const string& str){
 }
 
 CommandResult executeCommand(const Command& command){
-    if(command.command == "") return {true, "message"};
-    
+    if(command.command == "mkdisk") return RoutesDisk::mkdisk(command.params);
     return {false, " -> The command [" + command.command + "] was not recognized"};
 }
 

@@ -8,6 +8,7 @@
 class RoutesDisk{
     public:
         static CommandResult mkdisk(const std::map<std::string, std::string>& params);
+        static CommandResult rmdisk(const std::map<std::string, std::string>& params);
 };
 
 #endif

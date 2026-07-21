@@ -50,6 +50,7 @@ vector<Command> splitCommands(const string& str){
 
 CommandResult executeCommand(const Command& command){
     if(command.command == "mkdisk") return RoutesDisk::mkdisk(command.params);
+    else if(command.command == "rmdisk") return RoutesDisk::rmdisk(command.params);
     return {false, " -> The command [" + command.command + "] was not recognized"};
 }
 

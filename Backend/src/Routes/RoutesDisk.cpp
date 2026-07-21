@@ -12,7 +12,7 @@ CommandResult RoutesDisk::mkdisk(const map<string, string>& params){
     if(params.find("path") == params.end()) return {false, "Mkdisk: Missing parameter -path"};
     
     //The mandatory parameters are obtained
-    std::string path = std::string("Disks/") + params.at("path");
+    string path = "Disks/" + params.at("path");
     int size;
     try{ size = stoi(params.at("size")); }
     catch(...){return {false, "Mkdisk: Invalid value for size"};}
@@ -29,4 +29,10 @@ CommandResult RoutesDisk::mkdisk(const map<string, string>& params){
     else size *= 1024*1024;
     
     return ControllerDisk::createDisk(path, fit, size);
+}
+
+CommandResult RoutesDisk::rmdisk(const map<string, string>& params){
+    if(params.find("path") == params.end()) return {false, "Rmdisk: Missing parameter -path"};
+    string path = "Disks/" + params.at("path");
+    return ControllerDisk::deleteDisk(path);
 }

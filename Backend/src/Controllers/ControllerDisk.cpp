@@ -62,3 +62,9 @@ CommandResult ControllerDisk::createDisk(const string& path, char& fit, int& siz
     writeMBR(path, mbr);
     return {false, "Mkdisk: The disk was created succesfully"};
 }
+
+CommandResult ControllerDisk::deleteDisk(const string& path){
+    if(!diskExist(path)) return {false, "Rmdisk: The disk was not found"};
+    if(filesystem::remove(path)) return {true, "Rmdisk: The disk was removed succesfully"};
+    return {false, "Rmdisk: It was not possible to delete the disk"};
+}

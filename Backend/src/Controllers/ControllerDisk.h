@@ -1,5 +1,5 @@
 #ifndef CONTROLLERDISK_H_INCLUDED
-#define CONTROLLERdISK_H_INCLUDED
+#define CONTROLLERDISK_H_INCLUDED
 
 #include <string>
 #include "../Objects/MBR.h"

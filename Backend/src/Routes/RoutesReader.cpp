@@ -8,6 +8,7 @@
 #include "../Controllers/Utilities.h"
 #include "./Routes/RoutesDisk.h"
 #include "./RoutesReader.h"
+#include "./RoutesPartition.h"
 
 
 using namespace std;
@@ -51,6 +52,7 @@ vector<Command> splitCommands(const string& str){
 CommandResult executeCommand(const Command& command){
     if(command.command == "mkdisk") return RoutesDisk::mkdisk(command.params);
     else if(command.command == "rmdisk") return RoutesDisk::rmdisk(command.params);
+    else if(command.command == "fdisk") return RoutesPartition::fdisk(command.params);
     return {false, " -> The command [" + command.command + "] was not recognized"};
 }
 

@@ -4,6 +4,9 @@ echo "Compiling..."
 
 if ! g++ -std=c++17 \
     -I src \
+    -I src/Controllers \
+    -I src/Routes \
+    -I src/Objects \
     $(find src -name "*.cpp") \
     -o "$OUTPUT"
 then

@@ -15,7 +15,8 @@ CommandResult RoutesDisk::mkdisk(const map<string, string>& params){
     string path = "Disks/" + params.at("path");
     int size;
     try{ size = stoi(params.at("size")); }
-    catch(...){return {false, "Mkdisk: Invalid value for size"};}
+    catch(...){return {false, "Mkdisk: Invalid value for size of the disk"};}
+    if(size < 1) return {false, "Mkdisk: The size must be a positive size"};
     
     //Optional parameters
     char fit = 'f';

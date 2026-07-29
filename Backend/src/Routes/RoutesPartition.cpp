@@ -15,9 +15,9 @@ CommandResult RoutesPartition::fdisk(const map<string, string>& params){
     //Mandatory parameters
     string path = "Disks/" + params.at("path");
     
-    if(params.at("name").length() > 15) return {false, "Fdisk: The name cannot exceed 15 characteres"};
-    char name[15];
-    strncpy(name, params.at("name").c_str(), 15);
+    if(params.at("name").length() > 14) return {false, "Fdisk: The name cannot exceed 14 characteres"};
+    char name[15]{};
+    strncpy(name, params.at("name").c_str(), 14);
     //cout<<"The name is: ["<<name<<"]\n";
     
     int size;

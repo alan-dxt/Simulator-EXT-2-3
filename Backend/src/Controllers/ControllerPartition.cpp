@@ -9,6 +9,7 @@
 #include "../Objects/Partition.h"
 #include "./ControllerDisk.h"
 #include "./ControllerPartition.h"
+#include "./Utilities.h"
 
 using namespace std;
 
@@ -121,16 +122,20 @@ CommandResult ControllerPartition::createPartition(const string& path, char& typ
     else if(fit == 'f') byteStart = firstFit(mbr, size);
     else byteStart = worstFit(mbr, size);
     if(byteStart == -1) return {false, "Fdisk: The space for the partition is not enough"};
+
     //A free partition sought
     Partition* partition = nullptr;
-    int correlative;
-    for (int i = 0; i < 4; i++) {
-        if (mbr.partitions[i].part_start == -1) {
+    int correlative = 1;
+    bool partitionFound = false;
+    for(int i = 0; i < 4; i++){
+        if(strncmp(mbr.partitions[i].part_name, name, 15) == 0) return {false, "Fdisk: The name [" + string(name) + "] has already been taken"};
+        if(partitionFound == false && mbr.partitions[i].part_start == -1){
             partition = &mbr.partitions[i];
             correlative = i;
-            break;
+            partitionFound = true;
         }
     }
+
     if (partition == nullptr) return {false, "Fdisk: There are no free partition entries in the MBR"};
     //The data for the partition is assigned
     //status and doesnt change
@@ -139,6 +144,7 @@ CommandResult ControllerPartition::createPartition(const string& path, char& typ
     partition->part_start = byteStart;
     partition->part_s = size;
     strncpy(partition->part_name, name, 15);
+    partition->part_name[15] = '\0';
     partition->part_correlative = correlative;
     memset(partition->part_id, '0', 4);         //The initial id is 0000 
     ControllerDisk::writeMBR(path, mbr);

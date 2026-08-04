@@ -8,6 +8,7 @@
 class RoutesPartition{
     public:
         static CommandResult fdisk(const std::map<std::string, std::string>& params);
+        static CommandResult mount(const std::map<std::string, std::string>& params);
 };
 
 #endif

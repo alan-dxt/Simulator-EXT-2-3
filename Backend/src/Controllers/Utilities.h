@@ -6,6 +6,7 @@
 class Utilities{
     public:
         static std::string Trim(const std::string& str);
+        static bool diskExist(const std::string& path);
 };
 
 #endif

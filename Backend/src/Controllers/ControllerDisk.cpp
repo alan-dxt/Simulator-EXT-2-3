@@ -3,9 +3,12 @@
 #include <cstdlib>
 #include <cstring>
 #include <filesystem>
+#include <vector>
 #include "../Objects/MBR.h"
 #include "../Objects/CommandResult.h"
 #include "./ControllerDisk.h"
+#include "./ControllerSystem.h"
+#include "./Utilities.h"
 
 using namespace std;
 //ios::out | ios::binary    ->  CREATES
@@ -29,13 +32,30 @@ MBR ControllerDisk::readMBR(const string& path){
     return mbr;
 }
 
-bool ControllerDisk::diskExist(const string& path){
-    ifstream file(path, std::ios::binary);
-    return file.good();
-}
+vector<CommandResult> ControllerDisk::createDisk(const string& path, char& fit, int& size){
+    vector<CommandResult> results;
+    int counter;
+    if(Utilities::diskExist(path)){
+        results.push_back({false, "Mkdisk: The disk already exists"});
+        return results;
+    }
+    
+    //The paths are checked first
+    //Deletes invalid paths and checks the amount of disks
+    vector<CommandResult> newResults = ControllerSystem::cleanRegisteredPaths(counter);
+    if(counter >= 52){
+        results.push_back({false, "Mkdisk: The limit number of disks has been reached(52)"});
+        return results;
+    }
+    results.insert(
+        results.end(),
+        make_move_iterator(newResults.begin()),
+        make_move_iterator(newResults.end())
+    );
 
-CommandResult ControllerDisk::createDisk(const string& path, char& fit, int& size){
-    if(diskExist(path)) return {false, "Mkdisk: The disk already exists"};
+    //Disk registration must occur prior to creation
+    results.push_back(ControllerSystem::registerPath(path));
+
     //Creating the disk
     fstream file(path, ios::out | ios::binary);
     file.seekp(size -1);
@@ -58,13 +78,13 @@ CommandResult ControllerDisk::createDisk(const string& path, char& fit, int& siz
         currentPartition.part_s = -1;
         currentPartition.part_correlative = -1;
     }
-
     writeMBR(path, mbr);
-    return {false, "Mkdisk: The disk was created succesfully"};
+    results.push_back({true, "Mkdisk: The disk was created succesfully"});
+    return results;
 }
 
 CommandResult ControllerDisk::deleteDisk(const string& path){
-    if(!diskExist(path)) return {false, "Rmdisk: The disk was not found"};
+    if(!Utilities::diskExist(path)) return {false, "Rmdisk: The disk was not found"};
     if(filesystem::remove(path)) return {true, "Rmdisk: The disk was removed succesfully"};
     return {false, "Rmdisk: It was not possible to delete the disk"};
 }

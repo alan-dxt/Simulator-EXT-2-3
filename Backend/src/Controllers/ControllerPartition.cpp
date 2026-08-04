@@ -9,6 +9,8 @@
 #include "../Objects/Partition.h"
 #include "./ControllerDisk.h"
 #include "./ControllerPartition.h"
+#include "./ControllerGlobal.h"
+#include "./ControllerSystem.h"
 #include "./Utilities.h"
 
 using namespace std;
@@ -112,7 +114,7 @@ int worstFit(const MBR& mbr, int size){
 }
 
 CommandResult ControllerPartition::createPartition(const string& path, char& type, int& size, char& fit, char* name){
-    if(!ControllerDisk::diskExist(path)) return {false, "Fdisk: The disk was not found"};
+    if(!Utilities::diskExist(path)) return {false, "Fdisk: The disk was not found"};
     
     MBR mbr = ControllerDisk::readMBR(path);
     if(!partitionCounter(mbr, type)) return {false, "Fdisk: The disk capacity for a partition [" + string(type, 1) + "] has been reached"};
@@ -125,7 +127,7 @@ CommandResult ControllerPartition::createPartition(const string& path, char& typ
 
     //A free partition sought
     Partition* partition = nullptr;
-    int correlative = 1;
+    int correlative;
     bool partitionFound = false;
     for(int i = 0; i < 4; i++){
         if(strncmp(mbr.partitions[i].part_name, name, 15) == 0) return {false, "Fdisk: The name [" + string(name) + "] has already been taken"};
@@ -149,4 +151,56 @@ CommandResult ControllerPartition::createPartition(const string& path, char& typ
     memset(partition->part_id, '0', 4);         //The initial id is 0000 
     ControllerDisk::writeMBR(path, mbr);
     return {true, "Fdisk: The partition has been created succesfully"};
+}
+
+int fourth(const string& path){
+    string paths = "Disks/Paths.txt";
+    fstream file(paths, ios::in | ios::out | ios::binary);
+    string line;
+    int value = 0;
+    bool found = false;
+    while(getline(file, line)){
+        if(line.empty()) continue;
+        string currentPath = Utilities::Trim(line.substr(2));
+        if(currentPath == path){
+            found = true;
+            break;
+        }
+        value += 1;
+    }
+    file.close();
+    if(!found) return -1;
+    return value;
+}
+
+CommandResult ControllerPartition::mountPartition(const string& path, char* name){
+    if(!Utilities::diskExist(path)) return {false, "Mount: The disk was not found"};
+
+    MBR mbr = ControllerDisk::readMBR(path);
+    Partition* partition = nullptr;
+    for(Partition& currentPartition: mbr.partitions){
+        if(strncmp(currentPartition.part_name, name, 15) == 0){
+            if(currentPartition.part_status == 'v') return {false, "Mount: The partition is mounted currently"};
+            partition = &currentPartition;
+            break;
+        }
+    }
+    if(partition == nullptr) return {false, "Mount: The partition named [" + string(name) + "] was not found"};
+
+    //The id is generated
+    int fourthValue = fourth(path);
+    if(fourthValue == -1) return {false, "Mount: The partition with path [" + path + "] is not a registered disk"};
+
+    char idGenerated[4];
+    idGenerated[0] = '2';
+    idGenerated[1] = '9';
+    idGenerated[2] = '0' + partition->part_correlative;
+    idGenerated[3] = 'a' + fourthValue;
+    strncpy(partition->part_id, idGenerated, 4);
+    partition->part_status = 'v';
+    ControllerDisk::writeMBR(path, mbr);
+
+    //Registering in memory
+    //ControllerGlobal::addMountedPartition(path, partition->part_start, idGenerated, partition->part_name);
+    return {true, "Mount; The partition was mounted succesfully, id: " + string(idGenerated, 4)};
 }

@@ -7,6 +7,7 @@
 class ControllerPartition{
     public:
         static CommandResult createPartition(const std::string& path, char& type, int& size, char& fit, char* name);
+        static CommandResult mountPartition(const std::string& path, char* name);
 };
 
 #endif

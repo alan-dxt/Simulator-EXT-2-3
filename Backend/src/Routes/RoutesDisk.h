@@ -3,11 +3,12 @@
 
 #include <string>
 #include <map>
+#include <vector>
 #include "../Objects/CommandResult.h"
 
 class RoutesDisk{
     public:
-        static CommandResult mkdisk(const std::map<std::string, std::string>& params);
+        static std::vector<CommandResult> mkdisk(const std::map<std::string, std::string>& params);
         static CommandResult rmdisk(const std::map<std::string, std::string>& params);
 };
 

@@ -42,3 +42,17 @@ CommandResult RoutesPartition::fdisk(const map<string, string>& params){
 
     return ControllerPartition::createPartition(path, type, size, fit, name);
 }
+
+CommandResult RoutesPartition::mount(const map<string, string>& params){
+    if(params.find("path") == params.end()) return {false, "Mount: Missing parameter -path"};
+    if(params.find("name") == params.end()) return {false, "Mount: Missing parameter -name"};
+
+    //mandatory params
+    string path = "Disks/" + params.at("path");
+
+    if(params.at("name").length() > 14) return {false, "Mount: Names cannot exceed 14 characters"};
+    char name[15]{};
+    strncpy(name, params.at("name").c_str(), 14);
+    
+    return ControllerPartition::mountPartition(path, name);
+}

@@ -49,16 +49,35 @@ vector<Command> splitCommands(const string& str){
     return commands;
 }
 
+//Execution of commamnds with multiple responses
+vector<CommandResult> executeCommand2(const Command& command){
+    vector<CommandResult> response;
+    if(command.command == "mkdisk"){
+        response = RoutesDisk::mkdisk(command.params);
+    }
+    return response;
+}
+
+//Commands with only one response
 CommandResult executeCommand(const Command& command){
-    if(command.command == "mkdisk") return RoutesDisk::mkdisk(command.params);
-    else if(command.command == "rmdisk") return RoutesDisk::rmdisk(command.params);
+    if(command.command == "rmdisk") return RoutesDisk::rmdisk(command.params);
     else if(command.command == "fdisk") return RoutesPartition::fdisk(command.params);
+    else if(command.command == "mount") return RoutesPartition::mount(command.params);
     return {false, " -> The command [" + command.command + "] was not recognized"};
 }
 
 vector<CommandResult> executeCommands(const vector<Command>& commands){
     vector<CommandResult> results;
     for(const Command& currentCommand: commands){
+        if(currentCommand.command == "mkdisk"){
+            vector<CommandResult> multipleResults = executeCommand2(currentCommand);
+            results.insert(
+                results.end(),
+                make_move_iterator(multipleResults.begin()),
+                make_move_iterator(multipleResults.end())
+            );
+            continue;
+        }
         results.push_back(executeCommand(currentCommand));
     }
     return results;

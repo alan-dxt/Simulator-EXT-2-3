@@ -11,7 +11,7 @@ class ControllerDisk{
         static MBR readMBR(const std::string& path);
         static void writeMBR(const std::string& path, MBR& mbr);
         static std::vector<CommandResult> createDisk(const std::string& path, char& fit, int& size);
-        static CommandResult deleteDisk(const std::string& path);
+        static std::vector<CommandResult> deleteDisk(const std::string& path);
 };
 
 #endif

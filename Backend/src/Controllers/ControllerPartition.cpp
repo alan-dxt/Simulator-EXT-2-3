@@ -153,24 +153,21 @@ CommandResult ControllerPartition::createPartition(const string& path, char& typ
     return {true, "Fdisk: The partition has been created succesfully"};
 }
 
-int fourth(const string& path){
+char fourth(const string& path){
     string paths = "Disks/Paths.txt";
     fstream file(paths, ios::in | ios::out | ios::binary);
     string line;
-    int value = 0;
-    bool found = false;
     while(getline(file, line)){
         if(line.empty()) continue;
+        if(!ControllerSystem::isValidPathLine(line)) continue;
         string currentPath = Utilities::Trim(line.substr(2));
         if(currentPath == path){
-            found = true;
-            break;
+            file.close();
+            return line[0];
         }
-        value += 1;
     }
     file.close();
-    if(!found) return -1;
-    return value;
+    return 64;
 }
 
 CommandResult ControllerPartition::mountPartition(const string& path, char* name){
@@ -189,18 +186,18 @@ CommandResult ControllerPartition::mountPartition(const string& path, char* name
 
     //The id is generated
     int fourthValue = fourth(path);
-    if(fourthValue == -1) return {false, "Mount: The partition with path [" + path + "] is not a registered disk"};
+    if(fourthValue == 64) return {false, "Mount: The partition with path [" + path + "] is not a registered disk"};
 
     char idGenerated[4];
     idGenerated[0] = '2';
     idGenerated[1] = '9';
     idGenerated[2] = '0' + partition->part_correlative;
-    idGenerated[3] = 'a' + fourthValue;
+    idGenerated[3] = fourthValue;
     strncpy(partition->part_id, idGenerated, 4);
     partition->part_status = 'v';
     ControllerDisk::writeMBR(path, mbr);
 
     //Registering in memory
-    //ControllerGlobal::addMountedPartition(path, partition->part_start, idGenerated, partition->part_name);
+    ControllerGlobal::addMountedPartition(path, partition->part_start, idGenerated, partition->part_name);
     return {true, "Mount; The partition was mounted succesfully, id: " + string(idGenerated, 4)};
 }

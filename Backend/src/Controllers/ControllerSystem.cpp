@@ -75,7 +75,6 @@ vector<CommandResult> ControllerSystem::cleanRegisteredPaths(int& counter){
 }
 
 CommandResult ControllerSystem::registerPath(const std::string& path){
-    //checking if the file exists(not a disk)
     string paths = "Disks/Paths.txt";
     fstream file(paths, ios::in | ios::out | ios::binary);
 
@@ -110,5 +109,34 @@ CommandResult ControllerSystem::registerPath(const std::string& path){
     }
     //Response that shouldnt be reached
     return {false, "SYSTEM: The system doesnt support any more disk"};
+}
+
+CommandResult ControllerSystem::deletePath(const string& path){
+    string paths = "Disks/Paths.txt";
+    if(!Utilities::diskExist(paths)) return {false, "SYSTEM: The file 'Paths.txt' was not found"};
+
+    fstream file(paths, ios::in | ios::out | ios::binary);
+    string line;
+    bool found = false;
+    string newContent = "";
+    while(getline(file, line)){
+        if(line.empty()) continue;
+        if(!isValidPathLine(line)) continue;
+        string currentPath = line.substr(2);
+        
+        if(!found && currentPath == path){
+            found = true;
+            continue;
+        }
+
+        newContent += line + "\n";
+    }
+    file.close();
+    if(!found) return {false, "SYSTEM: The path given is not part of the registry"};
+    //The data is eliminated, then the new data is written
+    fstream fileE(paths, ios::out | ios::trunc);
+    fileE<<newContent;
+    fileE.close();
+    return {true, "SYSTEM: The path was succesfully removed from the registry"};
 }
 

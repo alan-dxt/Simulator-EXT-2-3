@@ -8,6 +8,7 @@
 #include "../Objects/CommandResult.h"
 #include "./ControllerDisk.h"
 #include "./ControllerSystem.h"
+#include "./ControllerGlobal.h"
 #include "./Utilities.h"
 
 using namespace std;
@@ -83,8 +84,18 @@ vector<CommandResult> ControllerDisk::createDisk(const string& path, char& fit, 
     return results;
 }
 
-CommandResult ControllerDisk::deleteDisk(const string& path){
-    if(!Utilities::diskExist(path)) return {false, "Rmdisk: The disk was not found"};
-    if(filesystem::remove(path)) return {true, "Rmdisk: The disk was removed succesfully"};
-    return {false, "Rmdisk: It was not possible to delete the disk"};
+vector<CommandResult> ControllerDisk::deleteDisk(const string& path){
+    vector<CommandResult> results;
+    results.push_back(ControllerSystem::deletePath(path));
+    ControllerGlobal::deleteMountedPartitionMemory(path);
+    if(!Utilities::diskExist(path)){
+        results.push_back({false, "Rmdisk: The disk was not found"});
+        return results;
+    }
+    if(filesystem::remove(path)){
+        results.push_back({true, "Rmdisk: The disk was removed succesfully"});
+        return results;
+    }
+    results.push_back({false, "Rmdisk: It was not possible to delete the disk"});
+    return results;
 }

@@ -51,8 +51,12 @@ vector<CommandResult> RoutesDisk::mkdisk(const map<string, string>& params){
     return ControllerDisk::createDisk(path, fit, size);
 }
 
-CommandResult RoutesDisk::rmdisk(const map<string, string>& params){
-    if(params.find("path") == params.end()) return {false, "Rmdisk: Missing parameter -path"};
+vector<CommandResult> RoutesDisk::rmdisk(const map<string, string>& params){
+    vector<CommandResult> results{};
+    if(params.find("path") == params.end()){
+        results.push_back({false, "Rmdisk: Missing parameter -path"});
+        return results;
+    }
     string path = "Disks/" + params.at("path");
     return ControllerDisk::deleteDisk(path);
 }

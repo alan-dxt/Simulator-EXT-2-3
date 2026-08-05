@@ -3,6 +3,8 @@
 #include <cstring>
 #include "./RoutesPartition.h"
 #include "../Objects/CommandResult.h"
+#include "../Objects/Mount.h"
+#include "../Controllers/ControllerGlobal.h"
 #include "../Controllers/ControllerPartition.h"
 
 using namespace std;
@@ -55,4 +57,15 @@ CommandResult RoutesPartition::mount(const map<string, string>& params){
     strncpy(name, params.at("name").c_str(), 14);
     
     return ControllerPartition::mountPartition(path, name);
+}
+
+CommandResult RoutesPartition::mounted(){
+    if(ControllerGlobal::mountedPartitions.empty()) return {true, "Mounted, There is no mounted partitions"};
+    string data = "Mounted: Mounted partitions\n";
+    data += "---------------------------------------\n";
+    for(Mount& currentMounted: ControllerGlobal::mountedPartitions){
+        data += "Path: " + currentMounted.path + " | Name: " + string(currentMounted.name) + " | ID: " + string(currentMounted.id, 4) + "\n";
+    }
+    data += "---------------------------------------\n";
+    return {true, data};
 }

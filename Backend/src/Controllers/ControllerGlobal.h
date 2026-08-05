@@ -14,6 +14,7 @@ class ControllerGlobal{
         //functions and methods
         static void addMountedPartition(const std::string& path, int& start, char* id, char* name);
         static Mount* getMountedPartition(const char* id);
+        static void deleteMountedPartitionMemory(const std::string& path);
 };
 
 #endif

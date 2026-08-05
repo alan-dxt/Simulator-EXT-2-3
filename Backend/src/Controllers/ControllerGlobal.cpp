@@ -21,7 +21,6 @@ void ControllerGlobal::addMountedPartition(const string& path, int& start, char*
     strncpy(mount.id, id, 4);
     strncpy(mount.name, name, 15);
     ControllerGlobal::mountedPartitions.push_back(mount);
-    //ControllerGlobal::currentMountedPartition = mount;
 }
 
 Mount* ControllerGlobal::getMountedPartition(const char* id){
@@ -29,4 +28,16 @@ Mount* ControllerGlobal::getMountedPartition(const char* id){
         if(strncmp(currentPartition.id, id, 4) == 0) return &currentPartition;
     }
     return nullptr;
+}
+
+//Delete the partitions from memory when deleting a disk
+void ControllerGlobal::deleteMountedPartitionMemory(const std::string& path) {
+    for (auto it = ControllerGlobal::mountedPartitions.begin();
+        it != ControllerGlobal::mountedPartitions.end(); ) {
+        if (it->path == path) {
+            it = ControllerGlobal::mountedPartitions.erase(it);
+        } else {
+            ++it;
+        }
+    }
 }

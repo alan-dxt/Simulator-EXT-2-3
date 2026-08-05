@@ -54,22 +54,24 @@ vector<CommandResult> executeCommand2(const Command& command){
     vector<CommandResult> response;
     if(command.command == "mkdisk"){
         response = RoutesDisk::mkdisk(command.params);
+    } else if(command.command == "rmdisk"){
+        response = RoutesDisk::rmdisk(command.params);
     }
     return response;
 }
 
 //Commands with only one response
 CommandResult executeCommand(const Command& command){
-    if(command.command == "rmdisk") return RoutesDisk::rmdisk(command.params);
-    else if(command.command == "fdisk") return RoutesPartition::fdisk(command.params);
+    if(command.command == "fdisk") return RoutesPartition::fdisk(command.params);
     else if(command.command == "mount") return RoutesPartition::mount(command.params);
+    else if(command.command == "mounted") return RoutesPartition::mounted();
     return {false, " -> The command [" + command.command + "] was not recognized"};
 }
 
 vector<CommandResult> executeCommands(const vector<Command>& commands){
     vector<CommandResult> results;
     for(const Command& currentCommand: commands){
-        if(currentCommand.command == "mkdisk"){
+        if(currentCommand.command == "mkdisk" || currentCommand.command == "rmdisk"){
             vector<CommandResult> multipleResults = executeCommand2(currentCommand);
             results.insert(
                 results.end(),

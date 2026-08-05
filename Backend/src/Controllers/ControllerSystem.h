@@ -10,6 +10,7 @@ class ControllerSystem{
         static bool isValidPathLine(const std::string& path);
         static CommandResult registerPath(const std::string& path);
         static std::vector<CommandResult> cleanRegisteredPaths(int& counter);
+        static CommandResult deletePath(const std::string& path);
 };
 
 #endif

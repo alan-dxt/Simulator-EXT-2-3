@@ -9,7 +9,7 @@
 class RoutesDisk{
     public:
         static std::vector<CommandResult> mkdisk(const std::map<std::string, std::string>& params);
-        static CommandResult rmdisk(const std::map<std::string, std::string>& params);
+        static std::vector<CommandResult> rmdisk(const std::map<std::string, std::string>& params);
 };
 
 #endif
